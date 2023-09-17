@@ -1,47 +1,42 @@
 import torch.nn as nn
 
 class Encoder(nn.Module):
-    def __init__(self, input_size):
+    def __init__(self, m):
         super(Encoder, self).__init__()
         self.layers = nn.Sequential(
-            nn.Conv1d(input_size, 100, kernel_size=1),
+            nn.Linear(m, 100),
             nn.Tanh(),
-            nn.Conv1d(100, 50, kernel_size=1),
+            nn.Linear(100, 50),
             nn.Tanh(),
-            nn.Conv1d(50, 25, kernel_size=1),
-            nn.Tanh()
+            nn.Linear(50, 1)  # to get scalar output νt
         )
     
     def forward(self, x):
         return self.layers(x)
-
 
 class Decoder(nn.Module):
-    def __init__(self, input_size):
+    def __init__(self, n):
         super(Decoder, self).__init__()
         self.layers = nn.Sequential(
-            nn.Conv1d(input_size, 100, kernel_size=1),
+            nn.Linear(1, 100),
             nn.Tanh(),
-            nn.Conv1d(100, 50, kernel_size=1),
+            nn.Linear(100, 50),
             nn.Tanh(),
-            nn.Conv1d(50, 25, kernel_size=1),
-            nn.Tanh()
+            nn.Linear(50, n)  # to get scalar output xˆt
         )
     
     def forward(self, x):
         return self.layers(x)
 
-
 class Discriminator(nn.Module):
-    def __init__(self, input_size):
+    def __init__(self):
         super(Discriminator, self).__init__()
         self.layers = nn.Sequential(
-            nn.Conv1d(input_size, 100, kernel_size=1),
+            nn.Linear(1, 100),  # Assuming input is νt, a scalar
             nn.Tanh(),
-            nn.Conv1d(100, 50, kernel_size=1),
+            nn.Linear(100, 50),
             nn.Tanh(),
-            nn.Conv1d(50, 25, kernel_size=1)
-            # No activation for the last layer as mentioned
+            nn.Linear(50, 25)  # Linear activation as the last one
         )
     
     def forward(self, x):
